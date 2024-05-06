@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.salas.msu.criminalintent.databinding.FragmentCrimeListBinding
 import kotlinx.coroutines.flow.collect
@@ -42,15 +43,21 @@ class CrimeListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                crimeListViewModel.crimes.collect { crimes ->
-                    binding.crimeRecyclerView.adapter =
-                        CrimeListAdapter(crimes)
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    crimeListViewModel.crimes.collect { crimes ->
+                        binding.crimeRecyclerView.adapter =
+                            CrimeListAdapter(crimes) { crimeId ->
+                                findNavController().navigate(
+                                    //R.id.show_crime_detail
+                                    CrimeListFragmentDirections.showCrimeDetail(crimeId)
+                                )
+                            }
+                    }
                 }
             }
         }
-    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
